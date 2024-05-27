@@ -24,7 +24,7 @@ const Map = ({ navigation }) => {
             
             <IconButtonCup 
                 onPress={() => navigation.navigate('Classification',
-                    { name: 'Classification' }
+                    { name: 'Classification-View' }
                 )}
                 iconSource={cup}
             />
