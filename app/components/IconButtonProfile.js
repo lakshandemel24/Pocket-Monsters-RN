@@ -3,15 +3,14 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { ProgressBar, MD3Colors, Avatar, Button } from 'react-native-paper';
 import * as SQLite from 'expo-sqlite';
 
-import img from '../assets/userdefault.jpg';
+import img from '../assets/playerIcon.png';
 
-const IconButton = ({ onPress, navigation }) => {
+const IconButton = ({ navigation }) => {
 
     /*const response = await CommunicationController.getUser('ZhyeEJ5lbtgFJ5BFBTvi', 1007)*/
 
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [name, setName] = useState(null);
 
     async function dbT() {
         const db = SQLite.openDatabase('PocketMonsters');
@@ -23,7 +22,6 @@ const IconButton = ({ onPress, navigation }) => {
         await db.transactionAsync(async tx => {
             const result = await tx.executeSqlAsync(selectUser, []);
             setUser(result.rows[0]);
-            setName(result.rows[0].name)
             setLoading(false);
         }).catch(error => {
             console.log("Errore nella query: " + error);
@@ -43,18 +41,10 @@ const IconButton = ({ onPress, navigation }) => {
             ) : (
                 user &&
                 <TouchableOpacity 
-                    onPress={() => navigation.navigate('Profile',
-                        { 
-                            name:  name, 
-                            setName: setName
-                        }
-                    )} 
+                    onPress={() => navigation.navigate('Profile', {sid: user.sid, source: 'Mappa'})} 
                     style={styles.buttonContent}
                 >
-                    <Avatar.Image size={70} source={user.picture ? {uri: 'data:image/png;base64,' + user.picture} : img} style={styles.img} />
-                    <Text style={styles.text}>{name}</Text>
-                    {/*<Text style={styles.text}>Lv. {parseInt(user.experience/100)}</Text>*/}
-                    {/*<ProgressBar progress={user.experience%100/100} color={'purple'} style={styles.pb}/>*/}
+                    <Avatar.Image size={70} source={img} style={styles.img} />
                 </TouchableOpacity>
             )}
             
@@ -65,11 +55,13 @@ const IconButton = ({ onPress, navigation }) => {
 const styles = StyleSheet.create({
     buttonContent: {
         position: 'absolute',
-        bottom: 13,
+        bottom: 15,
         right: 13,
-        borderRadius: 5,
+        borderRadius: 50,
         margin: 10,
-        alignItems: 'center'
+        alignItems: 'center',
+        borderWidth: 2,
+        borderColor: 'black',
     },
     icon: {
         width: 50,

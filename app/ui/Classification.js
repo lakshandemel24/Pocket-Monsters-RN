@@ -9,6 +9,7 @@ import BottomSheet from '../components/BottomSheet';
 import CommunicationController from '../api/CommunicationController';
 import img from '../assets/player.png';
 
+// Component for rendering individual player items
 const Item = ({ player, onPress }) => (
   <List.Item
     title={player.name}
@@ -27,6 +28,7 @@ const Classification = ( {route} ) => {
   const [playersData, setPlayersData] = useState(null);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
 
+// useEffect hook to fetch user data from AsyncStorage and get players' data
   useEffect(() => {
     AsyncStorage.getItem('user').then((user) => {
       const sid = JSON.parse(user).sid;
@@ -35,6 +37,7 @@ const Classification = ( {route} ) => {
 
   }, []);
 
+// Fetches ranking data and individual player data from the API
   const getPlayersData = async (sid) => {
 
     const users = await CommunicationController.getRanking(sid);
@@ -53,6 +56,7 @@ const Classification = ( {route} ) => {
 
   }
 
+// Opens the bottom sheet with the selected player's details
   const openBottomSheet = (p) => {
     setSelectedPlayer(p);
     bottomSheetRef.current?.expand()

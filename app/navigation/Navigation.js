@@ -16,6 +16,7 @@ export default function Navigation() {
                 screenOptions={{
                     headerStyle: {
                     backgroundColor: '#8a5401', // Background color of the header
+                    height: 50, // Height of the header
                     },
                     headerTintColor: '#fff', // Text color of the header
                     headerTitleStyle: {

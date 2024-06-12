@@ -17,11 +17,15 @@ import lifeIcon from '../assets/heart.png';
 
 import ModalObj from '../components/ModalObj';
 import BottomSheet from '../components/BottomSheet';
+import BottomSheetObjList from '../components/BottomSheetObjList';
+
+import listObl from '../assets/search.png'
 
 const GoogleMap = () => {
 
   const map = useRef(null);
   const bottomSheetRef = useRef(null);
+  const bottomSheetObjListRef = useRef(null);
   const [camera, setCamera] = useState(null);
   const [Markers, setMarkers] = useState([]); 
   const [user, setUser] = useState(null);
@@ -29,6 +33,7 @@ const GoogleMap = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedObj, setSelectedObj] = useState(null);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
+  const [virtalObjs, setVirtualObjs] = useState(null);
 
   const openModal = (obj) => {
     setModalVisible(true);
@@ -39,13 +44,21 @@ const GoogleMap = () => {
   }
   const openBottomSheet = (marker) => {
     setSelectedPlayer(marker)
-    bottomSheetRef.current?.expand()
+    bottomSheetRef.current.expand()
+  }
+
+  const openBottomSheetObjList = () => {
+    if (bottomSheetObjListRef.current) {
+      bottomSheetObjListRef.current.expand();
+    } else {
+      console.error("BottomSheetObjList is not ready");
+    }
   }
 
   useEffect(() => {
     const interval = setInterval(() => {
       _onMapReady();
-    }, 10000); // 10000 millisecondi = 10 secondi
+    }, 5000); // 10000 millisecondi = 10 secondi
   }, []);
 
   const getMarkers = async (lat, lon) => {
@@ -108,6 +121,10 @@ const GoogleMap = () => {
 
     setMarkers(arr);
 
+    const forList = arr.filter((v) => v.type !== "player");
+    
+    setVirtualObjs(forList);
+
   }
 
   const _onMapReady = useCallback(async () => {
@@ -124,8 +141,8 @@ const GoogleMap = () => {
           longitude: location.coords.longitude,
         },
         pitch: 50,
-        zoom: 19.5,
-        heading: 0,
+        zoom: 18,
+        heading: 200,
       });
 
       await getMarkers(JSON.stringify(location.coords.latitude), JSON.stringify(location.coords.longitude));
@@ -139,6 +156,8 @@ const GoogleMap = () => {
   const moveCamera = async () => {
     try {
       const location = await Location.getCurrentPositionAsync({});
+
+      //console.log(location)
     
       map.current.animateCamera({
         center: {
@@ -146,8 +165,8 @@ const GoogleMap = () => {
           longitude: location.coords.longitude,
         },
         pitch: 50,
-        zoom: 19.5,
-        heading: 0,
+        zoom: 18,
+        heading: 200,
       });
     }
     catch (error) {
@@ -203,6 +222,9 @@ const GoogleMap = () => {
           ))}
         </MapView>
         <IconButtonPosition onPress={moveCamera} iconSource={myPos} />
+        <TouchableOpacity onPress={() => openBottomSheetObjList()} style={styles.search}>
+            <Image source={listObl} style={styles.icon} />
+        </TouchableOpacity>
         <TouchableOpacity style={styles.buttonContent}>
           <Image source={lifeIcon} style={styles.lifeIcon} />
           <Text style={styles.text}>{life}</Text>
@@ -223,6 +245,12 @@ const GoogleMap = () => {
             bottomSheetRef={bottomSheetRef}
             player={selectedPlayer}
           />
+          <BottomSheetObjList
+            bottomSheetObjListRef={bottomSheetObjListRef}
+            user={user}
+            setLife={setLife}
+            virtualObjList={virtalObjs}
+          />
       </GestureHandlerRootView>
     </View>
   );
@@ -233,8 +261,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   markerIcon: {
-    height: 55,
-    width: 55,
+    height: 40,
+    width: 40,
   },
   lifeIcon: {
     width: 40,
@@ -258,6 +286,15 @@ const styles = StyleSheet.create({
   containerBS: {
     flex: 1,
   },
+  search: {
+    position: 'absolute',
+    top: 58,
+    left: '47%'
+  },
+  icon: {
+    width: 40,
+    height: 40,
+  }
 });
 
 const calculateDistance = (pointA, pointB) => {

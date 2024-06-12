@@ -7,7 +7,6 @@ import { Button } from 'react-native-paper';
 
 import CommunicationController from '../api/CommunicationController';
 import img from '../assets/player.png';
-import mapStyle from '../assets/mapStyle.json';
 
 export default function App({ bottomSheetRef, player }) {
 
@@ -88,10 +87,10 @@ export default function App({ bottomSheetRef, player }) {
             </View>
             {positionShare ? (
               <>
-                <Text style={styles.closeText}>Position</Text>
+                
                 <View style={{ borderWidth: 2, borderColor: 'black', marginTop: 15 }}>
                   <MapView
-                    style={{ width: '100%', height: 300}}
+                    style={{ width: '100%', height: 250}}
                     provider={PROVIDER_GOOGLE}
                     initialCamera={camera}
                     showsCompass={false}

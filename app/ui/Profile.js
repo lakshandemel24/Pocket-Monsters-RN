@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, Image, Switch, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, Image, Switch, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SQLite from 'expo-sqlite';
 import CommunicationController from '../api/CommunicationController';
 import { Avatar, Button, TextInput, IconButton } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
 import { useRoute } from '@react-navigation/native';
+import * as FileSystem from 'expo-file-system';
 
 import ModalArtifacts from '../components/ModalArtifacts';
 import ModalModifyVisible from '../components/ModalModify.js';
@@ -14,9 +15,8 @@ import imgUs from '../assets/userdefault.jpg';
 import img from '../assets/artifact.png'
 import modify from '../assets/modify.png'
 
-export default function App() {
+export default function App({route}) {
 
-  const route = useRoute();
   const [loading, setLoading] = useState(true);
   const [sid, setSid] = useState(null);
   const [uid, setUid] = useState(null);
@@ -30,7 +30,7 @@ export default function App() {
   const [selectedObj, setSelectedObj] = useState(null);
   const [image, setImage] = useState(null);
   const [modalModifyVisible, setModalModifyVisible] = useState(false);
-  const { name, setName } = route.params;
+  const [name, setName] = useState(null);
 
   const toggleSwitch = async () => {
     setIsEnabled(previousState => !previousState);
@@ -57,12 +57,30 @@ export default function App() {
       quality: 1,
     });
 
-    console.log(result.assets[0].uri);
-
     if (!result.canceled) {
-      //await CommunicationController.modifyUserProfilePicture(sid, uid, result.assets[0].uri) TO DOoooooooooooooooooooo
+      //await CommunicationController.modifyUserProfilePicture(sid, uid, result.assets[0].uri)
+
+      const filePath = result.assets[0].uri;
+
+      try {
+
+        const fileInfo = await FileSystem.getInfoAsync(filePath);
+        const fileSizeInKB = fileInfo.size / 1024;
+
+        if(fileSizeInKB > 100) {
+          Alert.alert('Error', 'Image too big, max 100KB');
+          return;
+        }
+
+        const content = await FileSystem.readAsStringAsync(filePath, { encoding: FileSystem.EncodingType.Base64 });
+        await CommunicationController.modifyUserProfilePicture(sid, uid, content);
+        setImage('data:image/png;base64,' + content);
+      } catch (error) {
+        console.error('Erroraccio: ' + error);
+      }
       
-      setImage(result.assets[0].uri);
+    } else {
+      Alert.alert('Error', 'No image selected');
     }
   };
 
@@ -73,6 +91,7 @@ export default function App() {
       setSid(sid);
       setUid(uid);
       getUserData(sid,uid);
+      //console.log(route)
     });
 
   }, []);

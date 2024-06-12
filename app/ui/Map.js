@@ -11,9 +11,6 @@ import defUser from '../assets/userdefault.jpg';
 
 const Map = ({ navigation }) => {
 
-    const [name, setName] = useState(null);
-    const [img, setImg] = useState(null);
-
     return (
         <View style={styles.containerBG}>
 

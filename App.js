@@ -10,6 +10,7 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+// Registers the user by either fetching from AsyncStorage or calling the API
   const registerUser = async () => {
     try {
       // Simulate registration delay
@@ -23,7 +24,6 @@ export default function App() {
           return;
         } else {
           const userData = await CommunicationController.register();
-          //userData = { sid: "ZhyeEJ5lbtgFJ5BFBTvi", uid: 1007}; RAMBO
           setUser(userData); 
           console.log("registering user: " + JSON.stringify(userData));
           await AsyncStorage.setItem('user', JSON.stringify(userData));
@@ -36,6 +36,9 @@ export default function App() {
     }
   };
 
+
+// Sets up the database and inserts/updates user data
+// Is called in registerUser
   async function dbSetUp(user) {
 
     const db = SQLite.openDatabase('PocketMonsters');
@@ -58,6 +61,7 @@ export default function App() {
       );
     `;
 
+// Creates the USER table if it doesn't exist
     await db.transactionAsync(async tx => {
       await tx.executeSqlAsync(createTable, []);
     }).catch(error => {
@@ -68,6 +72,7 @@ export default function App() {
       SELECT profileversion FROM USER WHERE sid = ? AND uid = ?;
     `;
 
+// Queries the database for the profile version of the user
     await db.transactionAsync(async tx => {
 
       const getDbProfileversion = await tx.executeSqlAsync(profileversionQuery, [sid, uid]);
@@ -75,6 +80,7 @@ export default function App() {
       
       const dbProfileversion = getDbProfileversion.rows;
 
+// Inserts the user if not found in the database
       if (dbProfileversion.length == 0) {
 
         console.log("User not found in db, inserting new user " + updatedUSer.name);
@@ -90,6 +96,7 @@ export default function App() {
         await tx.executeSqlAsync(insertUser, [sid, uid, updatedUSer.name, updatedUSer.positionShare, updatedUSer.profileversion, updatedUSer.life, updatedUSer.experience, updatedUSer.weapon, updatedUSer.armor, updatedUSer.amulet, updatedUSer.picture, sid, uid]);
         console.log("User inserted in db");
 
+// Updates the user if the profile version has changed
       } else if(dbProfileversion[0].profileversion != updatedUSer.profileversion) {
 
           const updateUser = `
@@ -111,6 +118,7 @@ export default function App() {
     setLoading(false);
   }
 
+// Executes the registerUser function on component mount
   useEffect(() => {
     registerUser();
   }, []);

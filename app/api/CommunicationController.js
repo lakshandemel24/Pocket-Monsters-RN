@@ -39,14 +39,6 @@ export default class CommunicationController {
         const bodyParams = {};
         return await CommunicationController.genericRequest(endPoint, verb, queryParams, bodyParams);
     }
-
-    static async activateObject(sid, uid) {
-        const endPoint = "objects/" + uid + '/activate/';
-        const verb = 'POST';
-        const queryParams = {};
-        const bodyParams = { sid: sid};
-        return await CommunicationController.genericRequest(endPoint, verb, queryParams, bodyParams);
-    }
     
     static async getUser(sid, uid) {
         const endPoint = "users/" + uid;
@@ -80,14 +72,6 @@ export default class CommunicationController {
         return await CommunicationController.genericRequest(endPoint, verb, queryParams, bodyParams);
     }
 
-    static async getObjects(sid, lat, lon) {
-        const endPoint = "objects/";
-        const verb = 'GET';
-        const queryParams = { sid: sid, lat: lat, lon: lon };
-        const bodyParams = {};
-        return await CommunicationController.genericRequest(endPoint, verb, queryParams, bodyParams);
-    }
-
     static async modifyUserPositionShare(sid, uid, positionshare) {
         const endPoint = "users/" + uid;
         const verb = 'PATCH';
@@ -109,6 +93,22 @@ export default class CommunicationController {
         const verb = 'PATCH';
         const queryParams = {};
         const bodyParams = { sid: sid, name: name };
+        return await CommunicationController.genericRequest(endPoint, verb, queryParams, bodyParams);
+    }
+
+    static async activateObject(sid, uid) {
+        const endPoint = "objects/" + uid + '/activate/';
+        const verb = 'POST';
+        const queryParams = {};
+        const bodyParams = { sid: sid};
+        return await CommunicationController.genericRequest(endPoint, verb, queryParams, bodyParams);
+    }
+
+    static async getObjects(sid, lat, lon) {
+        const endPoint = "objects/";
+        const verb = 'GET';
+        const queryParams = { sid: sid, lat: lat, lon: lon };
+        const bodyParams = {};
         return await CommunicationController.genericRequest(endPoint, verb, queryParams, bodyParams);
     }
 
